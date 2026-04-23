@@ -1,43 +1,39 @@
-import { useState } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { formSchema } from '../schema/formSchema';
+import { useFormEngine } from '../hooks/useFormEngine';
 import FieldRenderer from './FieldRenderer';
-import { buildValidationSchema } from '../utils/validation';
-
-const validationSchema = buildValidationSchema(formSchema);
+import { useState } from 'react';
+import { useSnackbar } from "../context/SnackbarContext";
 
 const FormRenderer = () => {
     const {
         register,
         control,
         handleSubmit,
-        formState: { errors }
-    } = useForm({
-        resolver: zodResolver(validationSchema)
-    });
+        errors,
+        values,
+        onSubmit
+    } = useFormEngine();
 
     const [step, setStep] = useState(1);
+    const [stepErrors, setStepErrors] = useState<any>({});
 
-    const values = useWatch({ control });
+    const { schema, validateAndProceed } = useFormEngine();
 
-    const onSubmit = (data: any) => {
-        console.log('Form Data:', data);
-    };
+    const { showMessage } = useSnackbar();
 
-    const currentFields = formSchema.filter((field) => field.step === step);
+    const currentFields = schema.filter((f: any) => f.step === step);
 
     const shouldRender = (field: any) => {
         if (!field.conditional) return true;
 
-        if (!values || !values[field.conditional.field]) return false;
-
-        return values[field.conditional.field] === field.conditional.value;
+        return values?.[field.conditional.field] === field.conditional.value;
     };
+
+    if (!schema || schema.length === 0) {
+        return <div>Loading form...</div>;
+    }
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-
             <h3>Step {step} of 2</h3>
 
             {currentFields.map((field) =>
@@ -64,7 +60,18 @@ const FormRenderer = () => {
                 )}
 
                 {step < 2 && (
-                    <button type="button" onClick={() => setStep(step + 1)}>
+                    <button
+                        type="button"
+                        onClick={async () => {
+                            const errors = await validateAndProceed(step, setStep);
+                            if (errors) {
+                                setStepErrors(errors);
+                                showMessage("Please fill all required fields before proceeding", "error");
+                                return;
+                            }
+                            setStepErrors({});
+                        }}
+                    >
                         Next
                     </button>
                 )}
@@ -72,6 +79,11 @@ const FormRenderer = () => {
                 {step === 2 && <button type="submit">Submit</button>}
             </div>
 
+            {/* {Object.keys(stepErrors).length > 0 && (
+                <p style={{ color: 'red' }}>
+                    Please complete all required fields to continue
+                </p>
+            )} */}
         </form>
     );
 };

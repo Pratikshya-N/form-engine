@@ -4,6 +4,7 @@ export interface Field {
   name: string;
   label: string;
   type: FieldType;
+  step: number;
 
   options?: { label: string; value: string }[];
 
