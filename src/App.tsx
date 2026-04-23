@@ -1,5 +1,12 @@
+import FormRenderer from './components/FormRenderer';
+
 function App() {
-  return <div>Form Engine</div>;
+  return (
+    <div>
+      <h2>Dynamic Form Engine</h2>
+      <FormRenderer />
+    </div>
+  );
 }
 
 export default App;
