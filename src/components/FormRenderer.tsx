@@ -1,24 +1,21 @@
-import { useFormEngine } from '../hooks/useFormEngine';
-import FieldRenderer from './FieldRenderer';
-import { useState } from 'react';
+import { useState } from "react";
+import FieldRenderer from "./FieldRenderer";
+import { useFormEngine } from "../hooks/useFormEngine";
 import { useSnackbar } from "../context/SnackbarContext";
 
 const FormRenderer = () => {
     const {
         register,
-        control,
         handleSubmit,
         errors,
         values,
+        schema,
         onSubmit
     } = useFormEngine();
 
-    const [step, setStep] = useState(1);
-    const [stepErrors, setStepErrors] = useState<any>({});
-
-    const { schema, validateAndProceed } = useFormEngine();
-
     const { showMessage } = useSnackbar();
+
+    const [step, setStep] = useState(1);
 
     const currentFields = schema.filter((f: any) => f.step === step);
 
@@ -28,23 +25,31 @@ const FormRenderer = () => {
         return values?.[field.conditional.field] === field.conditional.value;
     };
 
-    if (!schema || schema.length === 0) {
-        return <div>Loading form...</div>;
-    }
+    const handleNext = () => {
+        const stepFields = currentFields;
+
+        const hasError = stepFields.some((f: any) => !values?.[f.name]);
+
+        if (hasError) {
+            showMessage("Please complete required fields", "error");
+            return;
+        }
+
+        setStep((s) => s + 1);
+    };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <h3>Step {step} of 2</h3>
+            <h3>Step {step}</h3>
 
-            {currentFields.map((field) =>
+            {currentFields.map((field: any) =>
                 shouldRender(field) ? (
                     <div key={field.name}>
                         <label>{field.label}</label>
-
                         <FieldRenderer field={field} register={register} />
 
                         {errors[field.name] && (
-                            <p style={{ color: 'red' }}>
+                            <p style={{ color: "red" }}>
                                 {errors[field.name]?.message as string}
                             </p>
                         )}
@@ -52,7 +57,7 @@ const FormRenderer = () => {
                 ) : null
             )}
 
-            <div style={{ marginTop: '20px' }}>
+            <div>
                 {step > 1 && (
                     <button type="button" onClick={() => setStep(step - 1)}>
                         Previous
@@ -60,30 +65,13 @@ const FormRenderer = () => {
                 )}
 
                 {step < 2 && (
-                    <button
-                        type="button"
-                        onClick={async () => {
-                            const errors = await validateAndProceed(step, setStep);
-                            if (errors) {
-                                setStepErrors(errors);
-                                showMessage("Please fill all required fields before proceeding", "error");
-                                return;
-                            }
-                            setStepErrors({});
-                        }}
-                    >
+                    <button type="button" onClick={handleNext}>
                         Next
                     </button>
                 )}
 
                 {step === 2 && <button type="submit">Submit</button>}
             </div>
-
-            {/* {Object.keys(stepErrors).length > 0 && (
-                <p style={{ color: 'red' }}>
-                    Please complete all required fields to continue
-                </p>
-            )} */}
         </form>
     );
 };

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import type { ReactNode } from "react";
+import type { ReactNode as RN } from "react";
 
 type SnackbarType = "success" | "error" | "info";
 
@@ -15,11 +15,11 @@ interface SnackbarContextType {
 
 const SnackbarContext = createContext<SnackbarContextType | undefined>(undefined);
 
-export const SnackbarProvider = ({ children }: { children: ReactNode }) => {
+export const SnackbarProvider = ({ children }: { children: RN }) => {
   const [snackbar, setSnackbar] = useState<SnackbarState>({
     open: false,
     message: "",
-    type: "info",
+    type: "info"
   });
 
   const showMessage = (message: string, type: SnackbarType = "info") => {
@@ -35,20 +35,22 @@ export const SnackbarProvider = ({ children }: { children: ReactNode }) => {
       {children}
 
       {snackbar.open && (
-        <div style={{
-          position: "fixed",
-          bottom: 20,
-          right: 20,
-          padding: "12px 16px",
-          borderRadius: 6,
-          color: "#fff",
-          background:
-            snackbar.type === "error"
-              ? "#e74c3c"
-              : snackbar.type === "success"
-              ? "#2ecc71"
-              : "#333",
-        }}>
+        <div
+          style={{
+            position: "fixed",
+            bottom: 20,
+            right: 20,
+            padding: "10px 14px",
+            background:
+              snackbar.type === "error"
+                ? "red"
+                : snackbar.type === "success"
+                  ? "green"
+                  : "#333",
+            color: "#fff",
+            borderRadius: 6
+          }}
+        >
           {snackbar.message}
         </div>
       )}
@@ -58,8 +60,6 @@ export const SnackbarProvider = ({ children }: { children: ReactNode }) => {
 
 export const useSnackbar = () => {
   const context = useContext(SnackbarContext);
-  if (!context) {
-    throw new Error("useSnackbar must be used inside SnackbarProvider");
-  }
+  if (!context) throw new Error("useSnackbar must be used inside provider");
   return context;
 };

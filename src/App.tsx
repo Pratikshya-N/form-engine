@@ -1,6 +1,6 @@
-import FormRenderer from './components/FormRenderer';
+import FormRenderer from "./components/FormRenderer";
 
-function App() {
+export default function App() {
   return (
     <div>
       <h2>Dynamic Form Engine</h2>
@@ -8,5 +8,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

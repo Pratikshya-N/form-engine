@@ -1,33 +1,23 @@
-import type { Field } from '../types/formTypes';
+const FieldRenderer = ({ field, register }: any) => {
+  switch (field.type) {
+    case "text":
+      return <input {...register(field.name)} />;
 
-interface Props {
-    field: Field;
-    register: any;
-}
+    case "select":
+      return (
+        <select {...register(field.name)}>
+          <option value="">Select</option>
+          {field.options?.map((o: any) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      );
 
-const FieldRenderer = ({ field, register }: Props) => {
-    switch (field.type) {
-        case 'text':
-            return <input {...register(field.name)} placeholder={field.label} />;
-
-        case 'number':
-            return <input type="number" {...register(field.name)} />;
-
-        case 'select':
-            return (
-                <select {...register(field.name)}>
-                    <option value="">Select</option>
-                    {field.options?.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                        </option>
-                    ))}
-                </select>
-            );
-
-        default:
-            return null;
-    }
+    default:
+      return null;
+  }
 };
 
 export default FieldRenderer;

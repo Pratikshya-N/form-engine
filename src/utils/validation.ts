@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import type { Field } from '../types/formTypes';
+import { z } from "zod";
+import type { Field } from "../types/formTypes";
 
 export const buildValidationSchema = (fields: Field[]) => {
   const shape: Record<string, any> = {};
@@ -8,11 +8,13 @@ export const buildValidationSchema = (fields: Field[]) => {
     let validator;
 
     switch (field.type) {
-      case 'text':
+      case "text":
         validator = z.string();
+
         if (field.validation?.required) {
           validator = validator.min(1, `${field.label} is required`);
         }
+
         if (field.validation?.minLength) {
           validator = validator.min(
             field.validation.minLength,
@@ -21,12 +23,13 @@ export const buildValidationSchema = (fields: Field[]) => {
         }
         break;
 
-      case 'number':
+      case "number":
         validator = z.number();
         break;
 
-      case 'select':
+      case "select":
         validator = z.string();
+
         if (field.validation?.required) {
           validator = validator.min(1, `${field.label} is required`);
         }
