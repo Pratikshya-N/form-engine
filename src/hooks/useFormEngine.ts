@@ -1,62 +1,80 @@
 import { useEffect, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { getFormSchema } from "../api/getFormSchema";
-import { buildValidationSchema } from "../utils/validation";
 
-const STORAGE_KEY = "form-engine-data";
+const USERS_KEY = "users-db";
 
 export const useFormEngine = () => {
     const [schema, setSchema] = useState<any[]>([]);
 
+    const form = useForm({
+        mode: "onChange"
+    });
+
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        getValues,
+        trigger,
+        reset,
+        formState: { errors }
+    } = form;
+
+    // 🔹 Load schema
     useEffect(() => {
-        const load = async () => {
+        const loadSchema = async () => {
             const data = await getFormSchema();
             setSchema(data as any[]);
         };
 
-        load();
+        loadSchema();
     }, []);
 
-    const validationSchema = buildValidationSchema(schema || []);
+    // 🔹 Submit with duplicate validation
+    const onSubmit = (data: any, showMessage: any) => {
+        const existingUsers = JSON.parse(
+            localStorage.getItem(USERS_KEY) || "[]"
+        );
 
-    const form = useForm({
-        resolver: zodResolver(validationSchema)
-    });
+        // ❗ Duplicate check: same name with DIFFERENT role
+        const duplicate = existingUsers.find(
+            (u: any) =>
+                u.name.trim().toLowerCase() ===
+                data.name.trim().toLowerCase() &&
+                u.role !== data.role
+        );
 
-    const { register, control, handleSubmit, setValue, formState: { errors } } = form;
-
-    const values = useWatch({ control });
-
-    // Load draft
-    useEffect(() => {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            const parsed = JSON.parse(saved);
-            Object.keys(parsed).forEach((k) => setValue(k, parsed[k]));
+        if (duplicate) {
+            showMessage(
+                "Same name cannot be used for another role",
+                "error"
+            );
+            return false; // 🚨 important
         }
-    }, [setValue]);
 
-    // Auto-save draft
-    useEffect(() => {
-        if (values) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
-        }
-    }, [values]);
+        // ✅ Save valid user
+        const updatedUsers = [...existingUsers, data];
 
-    const onSubmit = (data: any) => {
-        console.log("SUBMIT:", data);
-        localStorage.removeItem(STORAGE_KEY);
+        localStorage.setItem(
+            USERS_KEY,
+            JSON.stringify(updatedUsers)
+        );
+
+        showMessage("Form submitted successfully", "success");
+
+        return true; // ✅ success flag
     };
 
     return {
         register,
-        control,
         handleSubmit,
         setValue,
+        getValues,
+        trigger,
+        reset,
         errors,
-        values,
-        onSubmit,
-        schema
+        schema,
+        onSubmit
     };
 };

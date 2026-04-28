@@ -16,8 +16,11 @@ export const getFormSchema = async () => {
                     step: 1,
                     options: [
                         { label: "User", value: "user" },
-                        { label: "Admin", value: "admin" }
-                    ]
+                        { label: "Admin", value: "admin" },
+                        { label: "Manager", value: "manager" },
+                        { label: "Viewer", value: "viewer" }
+                    ],
+                    validation: { required: true }
                 },
                 {
                     name: "adminCode",
@@ -27,7 +30,8 @@ export const getFormSchema = async () => {
                     conditional: {
                         field: "role",
                         value: "admin"
-                    }
+                    },
+                    validation: { required: true }
                 }
             ]);
         }, 500);
