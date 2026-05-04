@@ -8,9 +8,10 @@ import type { Field } from "../types/formTypes";
 
 interface Props {
     externalSchema?: Field[];
+    isTestMode?: boolean;
 }
 
-const FormRenderer = ({ externalSchema }: Props) => {
+const FormRenderer = ({ externalSchema, isTestMode }: Props) => {
 
     const {
         register,
@@ -19,6 +20,7 @@ const FormRenderer = ({ externalSchema }: Props) => {
         getValues,
         trigger,
         reset,
+        watch,
         errors,
         schema,
         onSubmit
@@ -26,39 +28,54 @@ const FormRenderer = ({ externalSchema }: Props) => {
 
     const { showMessage } = useSnackbar();
 
-    const [skipToSubmit, setSkipToSubmit] = useState(false);
     const [step, setStep] = useState(1);
-
     const totalSteps = 2;
 
-    const roleValue = getValues("role");
+    const watchedValues = watch(); // triggers re-render
 
     const activeSchema =
-        externalSchema && externalSchema?.length > 0
+        externalSchema && externalSchema.length > 0
             ? externalSchema
             : schema;
 
-
+    // Clear adminCode if role changes
     useEffect(() => {
+        const roleValue = getValues("role");
         if (roleValue !== "admin") {
-            // clear adminCode when not admin
             setValue("adminCode", "");
         }
-    }, [roleValue]);
+    }, [watchedValues.role]);
 
+    //  HYBRID shouldRender
     const shouldRender = (field: any) => {
         if (!field.conditional) return true;
 
+        // trigger re-render
+        const _ = watchedValues[field.conditional.field];
+
+        // stable value read
         const parentValue = getValues(field.conditional.field);
 
         return parentValue === field.conditional.value;
     };
-    const currentFields = activeSchema.filter((f: any) => f.step === step);
 
+    const currentFields = activeSchema.filter(
+        (f: any) => f.step === step && f?.name?.trim()
+    );
+
+    // dynamic next step detection
+    const nextStepFields = activeSchema.filter(
+        (f: any) =>
+            f.step === step + 1 &&
+            shouldRender(f) &&
+            f?.name?.trim()
+    );
+
+    const hasNextStep = nextStepFields.length > 0;
+
+    // NEXT HANDLER
     const handleNext = async () => {
-        const stepFieldNames = currentFields
-            .filter((f: any) => f?.name && f.name.trim() !== "")
-            .map((f: any) => f.name);
+        const stepFieldNames = currentFields.map((f: any) => f.name);
 
         const isValid = await trigger(stepFieldNames);
 
@@ -67,19 +84,20 @@ const FormRenderer = ({ externalSchema }: Props) => {
             return;
         }
 
-        const nextStepFields = activeSchema.filter(
-            (f: any) => f.step === step + 1 && shouldRender(f)
-        );
-
-        if (nextStepFields.length === 0) {
-            setSkipToSubmit(true);
-            showMessage("No additional fields for this role. You can submit now.", "info");
+        if (!hasNextStep) {
+            if (isTestMode) {
+                showMessage("Test mode: submission disabled", "info");
+            } else {
+                showMessage("No additional fields. You can submit now.", "info");
+            }
             return;
         }
 
+        showMessage(`Proceeding to Step ${step + 1}`, "info");
         setStep((s) => s + 1);
     };
 
+    // FINAL SUBMIT
     const handleFinalSubmit = async (data: any) => {
         const allFields = activeSchema
             .filter((f: any) => shouldRender(f))
@@ -92,19 +110,24 @@ const FormRenderer = ({ externalSchema }: Props) => {
             return;
         }
 
+        if (isTestMode) {
+            showMessage("Test mode: submission disabled", "info");
+            return;
+        }
+
         const cleanedData = { ...data };
 
         if (cleanedData.role !== "admin") {
             delete cleanedData.adminCode;
         }
 
+        console.log("data", cleanedData)
         const success = onSubmit(cleanedData, showMessage);
 
-        // 🚨 ONLY reset if success
+        // ONLY reset if success
         if (success) {
             reset();
             setStep(1);
-            setSkipToSubmit(false);
         }
     };
 
@@ -117,25 +140,23 @@ const FormRenderer = ({ externalSchema }: Props) => {
             <form onSubmit={handleSubmit(handleFinalSubmit)}>
                 <h3>Step {step}</h3>
 
-                {currentFields
-                    .filter((field: any) => field?.name && field.name.trim() !== "")
-                    .map((field: any) =>
-                        shouldRender(field) ? (
-                            <div key={field.name} style={{ marginBottom: 18 }}>
-                                <label style={formStyles.label}>
-                                    {field.label || field.name}
-                                </label>
+                {currentFields.map((field: any) =>
+                    shouldRender(field) ? (
+                        <div key={field.name} style={{ marginBottom: 18 }}>
+                            <label style={formStyles.label}>
+                                {field.label || field.name}
+                            </label>
 
-                                <FieldRenderer field={field} register={register} />
+                            <FieldRenderer field={field} register={register} />
 
-                                {errors?.[field.name] && (
-                                    <p style={formStyles.error}>
-                                        {errors[field.name]?.message as string}
-                                    </p>
-                                )}
-                            </div>
-                        ) : null
-                    )}
+                            {errors?.[field.name] && (
+                                <p style={formStyles.error}>
+                                    {errors[field.name]?.message as string}
+                                </p>
+                            )}
+                        </div>
+                    ) : null
+                )}
 
                 <div style={formStyles.buttonContainer}>
                     {step > 1 && (
@@ -148,7 +169,7 @@ const FormRenderer = ({ externalSchema }: Props) => {
                         </button>
                     )}
 
-                    {step < totalSteps && !skipToSubmit && (
+                    {step < totalSteps && hasNextStep && (
                         <button
                             type="button"
                             onClick={handleNext}
@@ -158,8 +179,16 @@ const FormRenderer = ({ externalSchema }: Props) => {
                         </button>
                     )}
 
-                    {(step === totalSteps || skipToSubmit) && (
-                        <button type="submit" style={formStyles.primaryBtn}>
+                    {(step === totalSteps || !hasNextStep) && (
+                        <button
+                            type="submit"
+                            disabled={isTestMode}
+                            style={
+                                isTestMode
+                                    ? formStyles.submitBtnDisabled
+                                    : formStyles.primaryBtn
+                            }
+                        >
                             Submit
                         </button>
                     )}
@@ -178,8 +207,8 @@ const FormRenderer = ({ externalSchema }: Props) => {
                         Clear
                     </button>
                 </div>
-            </form >
-        </div >
+            </form>
+        </div>
     );
 };
 

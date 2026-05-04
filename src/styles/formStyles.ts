@@ -86,7 +86,7 @@ export const formStyles: Record<string, CSSProperties> = {
     borderRadius: "6px",
     border: "1px solid #ccc",
     marginTop: 4,
-    boxSizing: "border-box", 
+    boxSizing: "border-box",
   },
   addBtn: {
     background: "#4a6cf7",
@@ -96,6 +96,15 @@ export const formStyles: Record<string, CSSProperties> = {
     borderRadius: "6px",
     cursor: "pointer",
     marginBottom: "10px"
+  },
+  submitBtnDisabled: {
+    backgroundColor: "#ccc",
+    color: "#666",
+    cursor: "not-allowed",
+    border: "none",
+    padding: "10px 16px",
+    borderRadius: 6,
+    // opacity: 0.7
   }
 };
 
@@ -112,23 +121,6 @@ export const builderStyles: Record<string, CSSProperties> = {
     overflowY: "auto",
     padding: 16,
   },
-
-  // container: {
-  //   height: "80vh",
-  //   display: "flex",
-  //   justifyContent: "center",
-  // },
-
-  // panel: {
-  //   width: "100%",
-  //   maxWidth: 800,
-  //   display: "flex",
-  //   flexDirection: "column",
-  //   border: "1px solid #e5e7eb",
-  //   borderRadius: 10,
-  //   background: "#fff",
-  //   overflow: "hidden",
-  // },
 
   header: {
     padding: 12,
@@ -149,6 +141,10 @@ export const builderStyles: Record<string, CSSProperties> = {
     padding: "8px 12px",
     borderRadius: 6,
     cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    fontWeight: 500
   },
 
   testBtn: {
@@ -158,13 +154,55 @@ export const builderStyles: Record<string, CSSProperties> = {
     padding: "8px 12px",
     borderRadius: 6,
     cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    fontWeight: 500
   },
 
-  // panelBody: {
-  //   flex: 1,
-  //   overflowY: "auto",
-  //   padding: 12,
-  // },
+  actions: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px"
+  },
+
+  iconBtn: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "36px",
+    height: "36px",
+    borderRadius: "8px",
+    border: "1px solid #ddd",
+    cursor: "pointer",
+    background: "#fff"
+  },
+
+  exportBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "8px 12px",
+    borderRadius: "8px",
+    border: "none",
+    cursor: "pointer",
+    background: "#6b7280", // ✅ neutral grey
+    color: "#fff",
+    fontWeight: 500
+  },
+
+  closeIcon: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "36px",
+    height: "36px",
+    borderRadius: "8px",
+    border: "none",
+    cursor: "pointer",
+    background: "#ef4444", // red
+    color: "#fff"
+  },
 
   emptyState: {
     textAlign: "center",

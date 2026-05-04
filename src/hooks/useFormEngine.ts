@@ -19,6 +19,7 @@ export const useFormEngine = () => {
         getValues,
         trigger,
         reset,
+        watch,
         formState: { errors }
     } = form;
 
@@ -74,6 +75,7 @@ export const useFormEngine = () => {
         getValues,
         trigger,
         reset,
+        watch,
         errors,
         schema,
         onSubmit

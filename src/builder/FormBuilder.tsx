@@ -1,16 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FieldEditor from "./FieldEditor";
 import type { Field } from "../types/formTypes";
 import { builderStyles } from "../styles/formStyles";
 import { useSnackbar } from "../context/SnackbarContext";
 import FormRenderer from "../components/FormRenderer";
+import { Upload, Download, Plus, Play, X } from "lucide-react";
 
+type Mode = "edit" | "test";
 
-const FormBuilder = () => {
-  const [fields, setFields] = useState<Field[]>([]);
-  const [showTest, setShowTest] = useState(false);
+interface Props {
+  schema: Field[];
+  setSchema: (data: Field[]) => void;
+}
+
+const FormBuilder = ({ schema, setSchema }: Props) => {
+  const [fields, setFields] = useState<Field[]>(schema || []);
+  const [mode, setMode] = useState<Mode>("edit");
 
   const { showMessage } = useSnackbar();
+
+  useEffect(() => {
+    setFields(schema);
+  }, [schema]);
+
+  useEffect(() => {
+    setSchema(fields);
+  }, [fields]);
 
   const addField = () => {
     setFields((prev) => [
@@ -27,36 +42,33 @@ const FormBuilder = () => {
     ]);
   };
 
-  const updateField = (index: number, updated: any) => {
+  const updateField = (index: number, updated: Field) => {
     const newFields = [...fields];
     newFields[index] = updated;
     setFields(newFields);
   };
 
   const deleteField = (index: number) => {
-    const newFields = fields.filter((_, i) => i !== index);
-    setFields(newFields);
+    setFields(fields.filter((_, i) => i !== index));
   };
 
   const handleTest = () => {
-    const validFields = fields.filter(
-      (f) => f.name && f.label
-    );
+    const validFields = fields.filter(f => f.name && f.label);
 
     if (!validFields.length) {
       showMessage("Add at least one valid field", "error");
       return;
     }
 
-    setShowTest(true);
+    setMode("test");
   };
 
   const handleExport = () => {
-    const dataStr = JSON.stringify(fields, null, 2);
+    const blob = new Blob([JSON.stringify(fields, null, 2)], {
+      type: "application/json"
+    });
 
-    const blob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement("a");
     a.href = url;
     a.download = "form-schema.json";
@@ -75,13 +87,27 @@ const FormBuilder = () => {
       try {
         const parsed = JSON.parse(event.target?.result as string);
 
-        // basic validation
         if (!Array.isArray(parsed)) {
-          throw new Error("Invalid schema format");
+          throw new Error("Invalid schema");
         }
 
-        setFields(parsed);
-      } catch (err) {
+        // ✅ Merge without duplicates (by name)
+        const merged = [...fields];
+
+        parsed.forEach((newField) => {
+          const exists = merged.some(
+            (f) => f.name === newField.name
+          );
+
+          if (!exists) {
+            merged.push(newField);
+          }
+        });
+
+        setFields(merged);
+        showMessage("Schema merged successfully", "success");
+
+      } catch {
         showMessage("Invalid JSON file", "error");
       }
     };
@@ -91,63 +117,96 @@ const FormBuilder = () => {
 
   return (
     <div style={builderStyles.panel}>
+
+      {/* ✅ HEADER */}
       <div style={builderStyles.header}>
         <h3 style={builderStyles.title}>Form Builder</h3>
 
-        <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={addField} style={builderStyles.addBtn}>
-            + Add Field
-          </button>
+        <div style={builderStyles.actions}>
 
-          <button onClick={handleTest} style={builderStyles.testBtn}>
-            Test Form
-          </button>
+          {/* ✅ Import Icon */}
+          <label style={builderStyles.iconBtn}>
+            <Upload size={18} />
+            <input
+              type="file"
+              accept="application/json"
+              onChange={handleImport}
+              style={{ display: "none" }}
+            />
+          </label>
 
-          {showTest && (
-            <div style={{ marginTop: 20 }}>
-              <h3>Test Form</h3>
-
-              <FormRenderer externalSchema={fields} />
-
-              <button onClick={() => setShowTest(false)}>
-                Close Test
-              </button>
-            </div>
-          )}
-
-          <button onClick={handleExport}>
+          {/* ✅ Export Button */}
+          <button
+            onClick={handleExport}
+            style={builderStyles.exportBtn}
+          >
+            <Download size={16} />
             Export JSON
           </button>
 
-          <input type="file" accept="application/json" onChange={handleImport} />
+          {/* ✅ Add Field */}
+          <button
+            onClick={addField}
+            style={builderStyles.addBtn}
+          >
+            <Plus size={14} />
+            Add Field
+          </button>
+
+          {/* ✅ Test Form */}
+          <button
+            onClick={handleTest}
+            style={builderStyles.testBtn}
+          >
+            <Play size={14} />
+            Test Form
+          </button>
+
+          {/* ✅ Close Icon (only in test mode) */}
+          {mode === "test" && (
+            <button
+              onClick={() => setMode("edit")}
+              style={builderStyles.closeIcon}
+            >
+              <X size={18} />
+            </button>
+          )}
         </div>
       </div>
 
-      <div style={builderStyles.panelBody}>
-        {fields.length === 0 ? (
-          <div style={builderStyles.emptyState}>
-            No fields added
+      {/* ✅ BODY SWITCH */}
+      {mode === "edit" ? (
+        <>
+          <div style={builderStyles.panelBody}>
+            {fields.length === 0 ? (
+              <div style={builderStyles.emptyState}>
+                No fields added
+              </div>
+            ) : (
+              fields.map((field, i) => (
+                <FieldEditor
+                  key={i}
+                  field={field}
+                  allFields={fields}
+                  onChange={(updated) => updateField(i, updated)}
+                  onDelete={() => deleteField(i)}
+                />
+              ))
+            )}
           </div>
-        ) : (
-          fields.map((field, i) => (
-            <FieldEditor
-              key={i}
-              field={field}
-              allFields={fields}
-              onChange={(updated: any) => updateField(i, updated)}
-              onDelete={() => deleteField(i)}
-            />
-          ))
-        )}
-      </div>
 
-      {/* JSON Preview */}
-      <div style={builderStyles.jsonBox}>
-        <h4>Schema JSON</h4>
-        <pre style={builderStyles.jsonPreview}>
-          {JSON.stringify(fields, null, 2)}
-        </pre>
-      </div>
+          <div style={builderStyles.jsonBox}>
+            <h4>Schema JSON</h4>
+            <pre style={builderStyles.jsonPreview}>
+              {JSON.stringify(fields, null, 2)}
+            </pre>
+          </div>
+        </>
+      ) : (
+        <div style={builderStyles.testContainer}>
+          <FormRenderer externalSchema={fields} isTestMode={true}/>
+        </div>
+      )}
     </div>
   );
 };
