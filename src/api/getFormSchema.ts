@@ -1,4 +1,6 @@
-export const getFormSchema = async () => {
+import type { Field } from "../types/formTypes";
+
+export const getFormSchema = async (): Promise<Field[]> => {
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve([

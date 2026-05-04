@@ -1,24 +1,22 @@
+import { formStyles } from "../styles/formStyles";
+
 const FieldRenderer = ({ field, register }: any) => {
+
+  if (!field?.name) return null;
+
   const rules = {
     required: field.validation?.required
       ? `${field.label} is required`
       : false
   };
 
-  const inputStyle = {
-    width: "100%",
-    padding: "10px",
-    borderRadius: "6px",
-    border: "1px solid #ccc",
-    marginTop: 4
-  };
 
   switch (field.type) {
     case "text":
       return (
         <input
           {...register(field.name, rules)}
-          style={inputStyle}
+          style={formStyles.input}
         />
       );
 
@@ -26,7 +24,7 @@ const FieldRenderer = ({ field, register }: any) => {
       return (
         <select
           {...register(field.name, rules)}
-          style={inputStyle}
+          style={formStyles.input}
         >
           <option value="">Select</option>
           {field.options?.map((o: any) => (

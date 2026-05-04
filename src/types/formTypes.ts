@@ -15,6 +15,6 @@ export interface Field {
 
   conditional?: {
     field: string;
-    value: string;
+    value: string | number;
   };
 }

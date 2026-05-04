@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { getFormSchema } from "../api/getFormSchema";
+import type { Field } from "../types/formTypes";
 
 const USERS_KEY = "users-db";
 
 export const useFormEngine = () => {
-    const [schema, setSchema] = useState<any[]>([]);
+    const [schema, setSchema] = useState<Field[]>([]);
 
     const form = useForm({
         mode: "onChange"
@@ -25,7 +26,7 @@ export const useFormEngine = () => {
     useEffect(() => {
         const loadSchema = async () => {
             const data = await getFormSchema();
-            setSchema(data as any[]);
+            setSchema(data || []);
         };
 
         loadSchema();

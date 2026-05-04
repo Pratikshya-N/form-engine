@@ -4,8 +4,14 @@ import { useFormEngine } from "../hooks/useFormEngine";
 import { useSnackbar } from "../context/SnackbarContext";
 import StepProgress from "./StepProgress";
 import { formStyles } from "../styles/formStyles";
+import type { Field } from "../types/formTypes";
 
-const FormRenderer = () => {
+interface Props {
+    externalSchema?: Field[];
+}
+
+const FormRenderer = ({ externalSchema }: Props) => {
+
     const {
         register,
         handleSubmit,
@@ -22,9 +28,16 @@ const FormRenderer = () => {
 
     const [skipToSubmit, setSkipToSubmit] = useState(false);
     const [step, setStep] = useState(1);
+
     const totalSteps = 2;
 
     const roleValue = getValues("role");
+
+    const activeSchema =
+        externalSchema && externalSchema?.length > 0
+            ? externalSchema
+            : schema;
+
 
     useEffect(() => {
         if (roleValue !== "admin") {
@@ -36,15 +49,15 @@ const FormRenderer = () => {
     const shouldRender = (field: any) => {
         if (!field.conditional) return true;
 
-        const values = getValues();
-        return values[field.conditional.field] === field.conditional.value;
-    };
+        const parentValue = getValues(field.conditional.field);
 
-    const currentFields = schema.filter((f: any) => f.step === step);
+        return parentValue === field.conditional.value;
+    };
+    const currentFields = activeSchema.filter((f: any) => f.step === step);
 
     const handleNext = async () => {
         const stepFieldNames = currentFields
-            .filter((f: any) => shouldRender(f))
+            .filter((f: any) => f?.name && f.name.trim() !== "")
             .map((f: any) => f.name);
 
         const isValid = await trigger(stepFieldNames);
@@ -54,7 +67,7 @@ const FormRenderer = () => {
             return;
         }
 
-        const nextStepFields = schema.filter(
+        const nextStepFields = activeSchema.filter(
             (f: any) => f.step === step + 1 && shouldRender(f)
         );
 
@@ -68,7 +81,7 @@ const FormRenderer = () => {
     };
 
     const handleFinalSubmit = async (data: any) => {
-        const allFields = schema
+        const allFields = activeSchema
             .filter((f: any) => shouldRender(f))
             .map((f: any) => f.name);
 
@@ -95,30 +108,34 @@ const FormRenderer = () => {
         }
     };
 
-    if (!schema.length) return <div>Loading...</div>;
+    if (!activeSchema.length) return <div>Loading...</div>;
 
     return (
-        <div style={{ width: "100%" }}>
+        <div style={formStyles.container}>
             <StepProgress currentStep={step} totalSteps={totalSteps} />
 
             <form onSubmit={handleSubmit(handleFinalSubmit)}>
                 <h3>Step {step}</h3>
 
-                {currentFields.map((field: any) =>
-                    shouldRender(field) ? (
-                        <div key={field.name} style={{ marginBottom: 18 }}>
-                            <label style={formStyles.label}>{field.label}</label>
+                {currentFields
+                    .filter((field: any) => field?.name && field.name.trim() !== "")
+                    .map((field: any) =>
+                        shouldRender(field) ? (
+                            <div key={field.name} style={{ marginBottom: 18 }}>
+                                <label style={formStyles.label}>
+                                    {field.label || field.name}
+                                </label>
 
-                            <FieldRenderer field={field} register={register} />
+                                <FieldRenderer field={field} register={register} />
 
-                            {errors[field.name] && (
-                                <p style={formStyles.error}>
-                                    {errors[field.name]?.message as string}
-                                </p>
-                            )}
-                        </div>
-                    ) : null
-                )}
+                                {errors?.[field.name] && (
+                                    <p style={formStyles.error}>
+                                        {errors[field.name]?.message as string}
+                                    </p>
+                                )}
+                            </div>
+                        ) : null
+                    )}
 
                 <div style={formStyles.buttonContainer}>
                     {step > 1 && (

@@ -1,25 +1,55 @@
-export const appStyles = {
-  app: {
+import type { CSSProperties } from "react";
+
+export const appStyles: Record<string, CSSProperties> = {
+  container: {
     height: "100vh",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "#f5f7fb"
+    background: "#f3f4f6",
   },
+
   card: {
-    width: "420px",
+    width: 900,
+    height: "85vh",           // 🔥 SAME HEIGHT FOR BOTH
     background: "#fff",
-    padding: "30px",
-    borderRadius: "12px",
-    boxShadow: "0 8px 24px rgba(0,0,0,0.1)"
+    borderRadius: 12,
+    border: "1px solid #e5e7eb",
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
   },
-  title: {
-    textAlign: "center" as const,
-    marginBottom: "20px"
+
+  switchContainer: {
+    display: "flex",
+    borderBottom: "1px solid #eee",
+  },
+
+  switchButton: {
+    flex: 1,
+    padding: 10,
+    border: "none",
+    cursor: "pointer",
+    background: "#f9fafb",
+  },
+
+  active: {
+    background: "#4a6cf7",
+    color: "#fff",
+  },
+
+  content: {
+    flex: 1,
+    overflow: "hidden",   // 🔒 prevents expansion
   }
 };
 
-export const formStyles = {
+export const formStyles: Record<string, CSSProperties> = {
+  container: {
+    height: "100%",
+    overflowY: "auto",
+    padding: 16,
+  },
   label: {
     display: "block",
     marginBottom: 6,
@@ -55,6 +85,131 @@ export const formStyles = {
     padding: "10px",
     borderRadius: "6px",
     border: "1px solid #ccc",
-    marginTop: 4
+    marginTop: 4,
+    boxSizing: "border-box", 
+  },
+  addBtn: {
+    background: "#4a6cf7",
+    color: "#fff",
+    border: "none",
+    padding: "10px 14px",
+    borderRadius: "6px",
+    cursor: "pointer",
+    marginBottom: "10px"
   }
+};
+
+export const builderStyles: Record<string, CSSProperties> = {
+
+  panel: {
+    height: "100%",       // 🔥 fill parent
+    display: "flex",
+    flexDirection: "column",
+  },
+
+  panelBody: {
+    flex: 1,
+    overflowY: "auto",
+    padding: 16,
+  },
+
+  // container: {
+  //   height: "80vh",
+  //   display: "flex",
+  //   justifyContent: "center",
+  // },
+
+  // panel: {
+  //   width: "100%",
+  //   maxWidth: 800,
+  //   display: "flex",
+  //   flexDirection: "column",
+  //   border: "1px solid #e5e7eb",
+  //   borderRadius: 10,
+  //   background: "#fff",
+  //   overflow: "hidden",
+  // },
+
+  header: {
+    padding: 12,
+    borderBottom: "1px solid #eee",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  title: {
+    margin: 0,
+  },
+
+  addBtn: {
+    background: "#4a6cf7",
+    color: "#fff",
+    border: "none",
+    padding: "8px 12px",
+    borderRadius: 6,
+    cursor: "pointer",
+  },
+
+  testBtn: {
+    background: "#10b981",
+    color: "#fff",
+    border: "none",
+    padding: "8px 12px",
+    borderRadius: 6,
+    cursor: "pointer",
+  },
+
+  // panelBody: {
+  //   flex: 1,
+  //   overflowY: "auto",
+  //   padding: 12,
+  // },
+
+  emptyState: {
+    textAlign: "center",
+    color: "#888",
+    marginTop: 40,
+  },
+
+  jsonBox: {
+    borderTop: "1px solid #eee",
+    padding: 12,
+    background: "#fafafa",
+  },
+
+  jsonPreview: {
+    fontSize: 12,
+    maxHeight: 150,
+    overflowY: "auto",
+    background: "#111",
+    color: "#0f0",
+    padding: 10,
+    borderRadius: 6,
+  },
+};
+
+export const FieldEditorStyles: Record<string, CSSProperties> = {
+  card: {
+    border: "1px solid #ddd",
+    borderRadius: 8,
+    marginBottom: 10,
+    overflow: "hidden",
+  },
+
+  cardHeader: {
+    background: "#f5f5f5",
+    padding: "10px 12px",
+    cursor: "pointer",
+    display: "flex",
+    justifyContent: "space-between",
+    fontWeight: 500,
+  },
+
+  cardBody: {
+    padding: 12,
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+  },
 };
