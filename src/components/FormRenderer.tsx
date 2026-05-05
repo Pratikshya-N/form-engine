@@ -134,30 +134,35 @@ const FormRenderer = ({ externalSchema, isTestMode }: Props) => {
     if (!activeSchema.length) return <div>Loading...</div>;
 
     return (
-        <div style={formStyles.container}>
-            <StepProgress currentStep={step} totalSteps={totalSteps} />
+        <div style={{ ...formStyles.container, width: "100%" }}>
+            <div style={{ marginTop: 20 }}>
+                <StepProgress currentStep={step} totalSteps={totalSteps} />
+            </div>
+            <form onSubmit={handleSubmit(handleFinalSubmit)} style={formStyles.innerForm}>
+                <h3 style={{ margin: "10px 16px" }}>Step {step}</h3>
 
-            <form onSubmit={handleSubmit(handleFinalSubmit)}>
-                <h3>Step {step}</h3>
+                {/* SCROLLABLE BODY */}
+                <div style={formStyles.formBody}>
+                    {currentFields.map((field: any) =>
+                        shouldRender(field) ? (
+                            <div key={field.name} style={{ marginBottom: 18 }}>
+                                <label style={formStyles.label}>
+                                    {field.label || field.name}
+                                </label>
 
-                {currentFields.map((field: any) =>
-                    shouldRender(field) ? (
-                        <div key={field.name} style={{ marginBottom: 18 }}>
-                            <label style={formStyles.label}>
-                                {field.label || field.name}
-                            </label>
+                                <FieldRenderer field={field} register={register} />
 
-                            <FieldRenderer field={field} register={register} />
+                                {errors?.[field.name] && (
+                                    <p style={formStyles.error}>
+                                        {errors[field.name]?.message as string}
+                                    </p>
+                                )}
+                            </div>
+                        ) : null
+                    )}
+                </div>
 
-                            {errors?.[field.name] && (
-                                <p style={formStyles.error}>
-                                    {errors[field.name]?.message as string}
-                                </p>
-                            )}
-                        </div>
-                    ) : null
-                )}
-
+                {/* FIXED FOOTER */}
                 <div style={formStyles.buttonContainer}>
                     {step > 1 && (
                         <button

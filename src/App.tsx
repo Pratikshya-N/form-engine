@@ -23,7 +23,7 @@ const App = () => {
   return (
     <div style={appStyles.container}>
       <div style={appStyles.card}>
-        <h2 style={{ textAlign: "center" }}>Dynamic Form Engine</h2>
+        <h2 style={{ textAlign: "center", margin: "12px 0" }}>Dynamic Form Engine</h2>
         {/* SWITCH BUTTONS */}
         <div style={appStyles.switchContainer}>
           <button

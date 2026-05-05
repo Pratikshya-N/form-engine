@@ -5,13 +5,14 @@ export const appStyles: Record<string, CSSProperties> = {
     height: "100vh",
     display: "flex",
     justifyContent: "center",
-    alignItems: "stretch",
+    alignItems: "center",
     background: "#f3f4f6",
   },
 
   card: {
     width: 900,
-    height: "85vh",           // SAME HEIGHT FOR BOTH
+    height: "90vh",
+    maxHeight: "95vh",
     background: "#fff",
     borderRadius: 12,
     border: "1px solid #e5e7eb",
@@ -41,15 +42,36 @@ export const appStyles: Record<string, CSSProperties> = {
   content: {
     flex: 1,
     minHeight: 0,
+    display: "flex",
+    flexDirection: "column",
     //  border: "2px solid red"
   }
 };
 
 export const formStyles: Record<string, CSSProperties> = {
   container: {
-  height: "100%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+  },
+  innerForm: {
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
+    minHeight: 0
+  },
+  formBody: {
+    flex: 1,
     overflowY: "auto",
-    padding: 16,
+    padding: "0 16px 12px 16px",
+  },
+  buttonContainer: {
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: 10,
+    padding: "12px 16px",
+    borderTop: "1px solid #eee",
+    background: "#fff",
   },
   label: {
     display: "block",
@@ -60,11 +82,6 @@ export const formStyles: Record<string, CSSProperties> = {
     color: "#e74c3c",
     fontSize: 12,
     marginTop: 4
-  },
-  buttonContainer: {
-    marginTop: 20,
-    display: "flex",
-    justifyContent: "space-between"
   },
   primaryBtn: {
     background: "#4a6cf7",
@@ -111,9 +128,10 @@ export const formStyles: Record<string, CSSProperties> = {
 export const builderStyles: Record<string, CSSProperties> = {
 
   panel: {
-    height: "100%",       // fill parent
+    height: "100%",
     display: "flex",
     flexDirection: "column",
+    width: "100%",
   },
 
   panelBody: {

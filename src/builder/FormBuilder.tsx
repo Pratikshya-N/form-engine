@@ -133,7 +133,7 @@ const FormBuilder = ({ schema, setSchema, onSave }: Props) => {
   };
 
   return (
-    <div style={builderStyles.panel}>
+    <div style={{ ...builderStyles.panel, width: "100%" }}>
 
       {/* HEADER */}
       <div style={builderStyles.header}>
