@@ -31,3 +31,45 @@ and render forms dynamically with conditional fields and multi-step logic.
 3. Renderer dynamically generates UI
 4. Conditional logic controls field visibility
 5. Multi-step navigation handled via step-based schema
+
+## 📁 Project Structure
+
+form-engine/
+│
+├── public/                     # Static assets
+│
+├── src/
+│   ├── components/            # Reusable UI components
+│   │   ├── FormRenderer.tsx
+│   │   ├── FieldRenderer.tsx
+│   │   ├── StepProgress.tsx
+│   │
+│   ├── builder/               # Form Builder module
+│   │   ├── FormBuilder.tsx
+│   │   ├── FieldEditor.tsx
+│   │
+│   ├── hooks/                 # Custom hooks
+│   │   ├── useFormEngine.ts
+│   │
+│   ├── context/               # Global context
+│   │   ├── SnackbarContext.tsx
+│   │
+│   ├── styles/                # Centralized styles
+│   │   ├── formStyles.ts
+│   │
+│   ├── types/                 # TypeScript types
+│   │   ├── formTypes.ts
+│   │
+│   ├── App.tsx                # Root component
+│   ├── main.tsx               # Entry point
+│
+├── package.json
+├── tsconfig.json
+├── README.md
+
+## 💻 Run Locally
+
+git clone <repo-url>
+cd form-engine
+npm install
+npm run dev
