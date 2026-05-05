@@ -34,42 +34,47 @@ and render forms dynamically with conditional fields and multi-step logic.
 
 ## 📁 Project Structure
 
-form-engine/
-│
-├── public/                     # Static assets
-│
-├── src/
-│   ├── components/            # Reusable UI components
-│   │   ├── FormRenderer.tsx
-│   │   ├── FieldRenderer.tsx
-│   │   ├── StepProgress.tsx
-│   │
-│   ├── builder/               # Form Builder module
-│   │   ├── FormBuilder.tsx
-│   │   ├── FieldEditor.tsx
-│   │
-│   ├── hooks/                 # Custom hooks
-│   │   ├── useFormEngine.ts
-│   │
-│   ├── context/               # Global context
-│   │   ├── SnackbarContext.tsx
-│   │
-│   ├── styles/                # Centralized styles
-│   │   ├── formStyles.ts
-│   │
-│   ├── types/                 # TypeScript types
-│   │   ├── formTypes.ts
-│   │
-│   ├── App.tsx                # Root component
-│   ├── main.tsx               # Entry point
-│
-├── package.json
-├── tsconfig.json
-├── README.md
+-public/
+Contains static assets like the HTML template and any public files.
+-src/
+Main application source code.
+-components/
+Reusable UI components used across the application.
+-Includes:
+-FormRenderer – renders the dynamic form based on schema
+-FieldRenderer – renders individual form fields
+-StepProgress – shows step navigation UI
+-builder/
+Handles the form builder functionality.
+-Includes:
+-FormBuilder – main builder container (edit/test modes, import/export, save)
+-FieldEditor – UI for adding/editing individual fields
+-hooks/
+Custom React hooks for managing logic.
+-useFormEngine – core logic for form state, validation, submission, and schema handling
+-context/
+Global state management using React Context.
+-SnackbarContext – handles global messages/notifications
+-styles/
+Centralized styling objects.
+-formStyles – styles for form, builder, buttons, layout
+-types/
+TypeScript type definitions.
+-formTypes – defines the structure of fields and schema
+-App.tsx
+Root component that switches between Form View and Builder View
+-main.tsx
+Entry point of the React application
+-package.json
+Project dependencies and scripts
+-tsconfig.json
+TypeScript configuration
+-README.md
+Project documentation
 
 ## 💻 Run Locally
 
-git clone <repo-url>
-cd form-engine
-npm install
-npm run dev
+-git clone <repo-url>
+-cd form-engine
+-npm install
+-npm run dev
