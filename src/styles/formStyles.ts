@@ -5,13 +5,13 @@ export const appStyles: Record<string, CSSProperties> = {
     height: "100vh",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "stretch",
     background: "#f3f4f6",
   },
 
   card: {
     width: 900,
-    height: "85vh",           // 🔥 SAME HEIGHT FOR BOTH
+    height: "85vh",           // SAME HEIGHT FOR BOTH
     background: "#fff",
     borderRadius: 12,
     border: "1px solid #e5e7eb",
@@ -40,13 +40,14 @@ export const appStyles: Record<string, CSSProperties> = {
 
   content: {
     flex: 1,
-    overflow: "hidden",   // 🔒 prevents expansion
+    minHeight: 0,
+    //  border: "2px solid red"
   }
 };
 
 export const formStyles: Record<string, CSSProperties> = {
   container: {
-    height: "100%",
+  height: "100%",
     overflowY: "auto",
     padding: 16,
   },
@@ -104,14 +105,13 @@ export const formStyles: Record<string, CSSProperties> = {
     border: "none",
     padding: "10px 16px",
     borderRadius: 6,
-    // opacity: 0.7
   }
 };
 
 export const builderStyles: Record<string, CSSProperties> = {
 
   panel: {
-    height: "100%",       // 🔥 fill parent
+    height: "100%",       // fill parent
     display: "flex",
     flexDirection: "column",
   },
@@ -186,7 +186,7 @@ export const builderStyles: Record<string, CSSProperties> = {
     borderRadius: "8px",
     border: "none",
     cursor: "pointer",
-    background: "#6b7280", // ✅ neutral grey
+    background: "#6b7280", // neutral grey
     color: "#fff",
     fontWeight: 500
   },

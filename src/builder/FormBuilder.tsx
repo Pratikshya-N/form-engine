@@ -11,9 +11,10 @@ type Mode = "edit" | "test";
 interface Props {
   schema: Field[];
   setSchema: (data: Field[]) => void;
+  onSave: (data: Field[]) => void;
 }
 
-const FormBuilder = ({ schema, setSchema }: Props) => {
+const FormBuilder = ({ schema, setSchema, onSave }: Props) => {
   const [fields, setFields] = useState<Field[]>(schema || []);
   const [mode, setMode] = useState<Mode>("edit");
 
@@ -91,7 +92,7 @@ const FormBuilder = ({ schema, setSchema }: Props) => {
           throw new Error("Invalid schema");
         }
 
-        // ✅ Merge without duplicates (by name)
+        // Merge without duplicates (by name)
         const merged = [...fields];
 
         parsed.forEach((newField) => {
@@ -115,16 +116,32 @@ const FormBuilder = ({ schema, setSchema }: Props) => {
     reader.readAsText(file);
   };
 
+  const handleSave = () => {
+    const validFields = fields.filter((f) => f.name && f.label);
+
+    if (!validFields.length) {
+      showMessage("Add valid fields before saving", "error");
+      return;
+    }
+
+    onSave(validFields); // send to App
+
+    showMessage("Fields saved to form", "success");
+
+    setFields([]);      // reset builder
+    setMode("edit");    // go back
+  };
+
   return (
     <div style={builderStyles.panel}>
 
-      {/* ✅ HEADER */}
+      {/* HEADER */}
       <div style={builderStyles.header}>
         <h3 style={builderStyles.title}>Form Builder</h3>
 
         <div style={builderStyles.actions}>
 
-          {/* ✅ Import Icon */}
+          {/* Import Icon */}
           <label style={builderStyles.iconBtn}>
             <Upload size={18} />
             <input
@@ -135,7 +152,7 @@ const FormBuilder = ({ schema, setSchema }: Props) => {
             />
           </label>
 
-          {/* ✅ Export Button */}
+          {/* Export Button */}
           <button
             onClick={handleExport}
             style={builderStyles.exportBtn}
@@ -144,7 +161,7 @@ const FormBuilder = ({ schema, setSchema }: Props) => {
             Export JSON
           </button>
 
-          {/* ✅ Add Field */}
+          {/* Add Field */}
           <button
             onClick={addField}
             style={builderStyles.addBtn}
@@ -153,7 +170,7 @@ const FormBuilder = ({ schema, setSchema }: Props) => {
             Add Field
           </button>
 
-          {/* ✅ Test Form */}
+          {/* Test Form */}
           <button
             onClick={handleTest}
             style={builderStyles.testBtn}
@@ -162,19 +179,25 @@ const FormBuilder = ({ schema, setSchema }: Props) => {
             Test Form
           </button>
 
-          {/* ✅ Close Icon (only in test mode) */}
+          {/* Close Icon (only in test mode) */}
           {mode === "test" && (
-            <button
-              onClick={() => setMode("edit")}
-              style={builderStyles.closeIcon}
-            >
-              <X size={18} />
-            </button>
+            <>
+              <button onClick={handleSave} style={builderStyles.addBtn}>
+                Save Form
+              </button>
+
+              <button
+                onClick={() => setMode("edit")}
+                style={builderStyles.closeIcon}
+              >
+                <X size={18} />
+              </button>
+            </>
           )}
         </div>
       </div>
 
-      {/* ✅ BODY SWITCH */}
+      {/* BODY SWITCH */}
       {mode === "edit" ? (
         <>
           <div style={builderStyles.panelBody}>
@@ -204,7 +227,7 @@ const FormBuilder = ({ schema, setSchema }: Props) => {
         </>
       ) : (
         <div style={builderStyles.testContainer}>
-          <FormRenderer externalSchema={fields} isTestMode={true}/>
+          <FormRenderer externalSchema={fields} isTestMode={true} />
         </div>
       )}
     </div>

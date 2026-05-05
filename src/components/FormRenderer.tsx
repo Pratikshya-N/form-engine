@@ -169,6 +169,20 @@ const FormRenderer = ({ externalSchema, isTestMode }: Props) => {
                         </button>
                     )}
 
+                    <button
+                        type="button"
+                        onClick={() => {
+                            currentFields
+                                .filter((f: any) => shouldRender(f))
+                                .forEach((field: any) => {
+                                    setValue(field.name, "");
+                                });
+                        }}
+                        style={formStyles.secondaryBtn}
+                    >
+                        Clear
+                    </button>
+
                     {step < totalSteps && hasNextStep && (
                         <button
                             type="button"
@@ -193,19 +207,6 @@ const FormRenderer = ({ externalSchema, isTestMode }: Props) => {
                         </button>
                     )}
 
-                    <button
-                        type="button"
-                        onClick={() => {
-                            currentFields
-                                .filter((f: any) => shouldRender(f))
-                                .forEach((field: any) => {
-                                    setValue(field.name, "");
-                                });
-                        }}
-                        style={formStyles.secondaryBtn}
-                    >
-                        Clear
-                    </button>
                 </div>
             </form>
         </div>
