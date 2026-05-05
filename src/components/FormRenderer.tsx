@@ -51,7 +51,7 @@ const FormRenderer = ({ externalSchema, isTestMode }: Props) => {
         if (!field.conditional) return true;
 
         // trigger re-render
-        const _ = watchedValues[field.conditional.field];
+        void watchedValues[field.conditional.field];
 
         // stable value read
         const parentValue = getValues(field.conditional.field);
