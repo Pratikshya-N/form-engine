@@ -35,42 +35,42 @@ and render forms dynamically with conditional fields and multi-step logic.
 ## 📁 Project Structure
 
 - public/
-Contains static assets like the HTML template and any public files.
+  Contains static assets like the HTML template and any public files.
 - src/
-Main application source code.
+  Main application source code.
 - components/
-Reusable UI components used across the application.
-- Includes:
-- FormRenderer – renders the dynamic form based on schema
-- FieldRenderer – renders individual form fields
-- StepProgress – shows step navigation UI
+  Reusable UI components used across the application.
+  Includes:
+  1. FormRenderer – renders the dynamic form based on schema
+  2. FieldRenderer – renders individual form fields
+  3. StepProgress – shows step navigation UI
 - builder/
-Handles the form builder functionality.
-- Includes:
-- FormBuilder – main builder container (edit/test modes, import/export, save)
-- FieldEditor – UI for adding/editing individual fields
+  Handles the form builder functionality.
+  Includes:
+  1. FormBuilder – main builder container (edit/test modes, import/export, save)
+  2. FieldEditor – UI for adding/editing individual fields
 - hooks/
-Custom React hooks for managing logic.
-- useFormEngine – core logic for form state, validation, submission, and schema handling
+  Custom React hooks for managing logic.
+  1. useFormEngine – core logic for form state, validation, submission, and schema handling
 - context/
-Global state management using React Context.
-- SnackbarContext – handles global messages/notifications
+  Global state management using React Context.
+  1. SnackbarContext – handles global messages/notifications
 - styles/
-Centralized styling objects.
-- formStyles – styles for form, builder, buttons, layout
+  Centralized styling objects.
+  1. formStyles – styles for form, builder, buttons, layout
 - types/
-TypeScript type definitions.
-- formTypes – defines the structure of fields and schema
+  TypeScript type definitions.
+  1. formTypes – defines the structure of fields and schema
 - App.tsx
-Root component that switches between Form View and Builder View
+  Root component that switches between Form View and Builder View
 - main.tsx
-Entry point of the React application
+  Entry point of the React application
 - package.json
-Project dependencies and scripts
+  Project dependencies and scripts
 - tsconfig.json
-TypeScript configuration
+  TypeScript configuration
 - README.md
-Project documentation
+  Project documentation
 
 ## 💻 Run Locally
 
