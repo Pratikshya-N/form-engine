@@ -73,6 +73,43 @@ const FormRenderer = ({ externalSchema, isTestMode }: Props) => {
 
     const hasNextStep = nextStepFields.length > 0;
 
+    //computed states
+    const isStep1 = step === 1;
+    const isStep2 = step === 2;
+
+    // submit enabled logic
+    const canSubmit =
+        (isStep1 && !hasNextStep) || // no step 2 → allow submit in step 1
+        isStep2;                     // step 2 → always allow (validation handled separately)
+
+
+    // check if any field has value (for Clear button)
+    const hasAnyValue = currentFields.some((field: any) => {
+        const val = getValues(field.name);
+
+        if (val === undefined || val === null) return false;
+        if (typeof val === "string" && val.trim() === "") return false;
+        if (Array.isArray(val) && val.length === 0) return false;
+
+        return true;
+    });
+
+    //check for conditional field
+    const conditionalParents = Array.from(
+        new Set(
+            activeSchema
+                .filter((f: any) => f.conditional?.field)
+                .map((f: any) => f.conditional.field)
+        )
+    );
+    //check for conditional value selected or not
+    const areConditionalsResolved = conditionalParents.every(
+        (fieldName) => {
+            const value = getValues(fieldName);
+            return value !== undefined && value !== null && value !== "";
+        }
+    );
+
     // NEXT HANDLER
     const handleNext = async () => {
         const stepFieldNames = currentFields.map((f: any) => f.name);
@@ -84,16 +121,8 @@ const FormRenderer = ({ externalSchema, isTestMode }: Props) => {
             return;
         }
 
-        if (!hasNextStep) {
-            if (isTestMode) {
-                showMessage("Test mode: submission disabled", "info");
-            } else {
-                showMessage("No additional fields. You can submit now.", "info");
-            }
-            return;
-        }
+        if (!hasNextStep) return;
 
-        showMessage(`Proceeding to Step ${step + 1}`, "info");
         setStep((s) => s + 1);
     };
 
@@ -110,18 +139,12 @@ const FormRenderer = ({ externalSchema, isTestMode }: Props) => {
             return;
         }
 
-        if (isTestMode) {
-            showMessage("Test mode: submission disabled", "info");
-            return;
-        }
-
         const cleanedData = { ...data };
 
         if (cleanedData.role !== "admin") {
             delete cleanedData.adminCode;
         }
 
-        console.log("data", cleanedData)
         const success = onSubmit(cleanedData, showMessage);
 
         // ONLY reset if success
@@ -164,54 +187,70 @@ const FormRenderer = ({ externalSchema, isTestMode }: Props) => {
 
                 {/* FIXED FOOTER */}
                 <div style={formStyles.buttonContainer}>
-                    {step > 1 && (
+
+                    <div style={formStyles.btnDiv}>
+                        {/* Previous */}
                         <button
                             type="button"
                             onClick={() => setStep(step - 1)}
+                            disabled={isStep1}
                             style={formStyles.secondaryBtn}
                         >
                             Previous
                         </button>
-                    )}
 
-                    <button
-                        type="button"
-                        onClick={() => {
-                            currentFields
-                                .filter((f: any) => shouldRender(f))
-                                .forEach((field: any) => {
-                                    setValue(field.name, "");
-                                });
-                        }}
-                        style={formStyles.secondaryBtn}
-                    >
-                        Clear
-                    </button>
+                        {/* Clear */}
+                        <button
+                            type="button"
+                            disabled={!hasAnyValue}
+                            onClick={() => {
+                                currentFields
+                                    .filter((f: any) => shouldRender(f))
+                                    .forEach((field: any) => {
+                                        setValue(field.name, "");
+                                    });
+                            }}
+                            style={formStyles.secondaryBtn}
+                        >
+                            Clear
+                        </button>
 
-                    {step < totalSteps && hasNextStep && (
+                        {/* Next */}
                         <button
                             type="button"
                             onClick={handleNext}
-                            style={formStyles.primaryBtn}
+                            disabled={!hasNextStep}
+                            style={!hasNextStep ? formStyles.submitBtnDisabled : formStyles.primaryBtn}
                         >
                             Next
                         </button>
-                    )}
 
-                    {(step === totalSteps || !hasNextStep) && (
+                        {/* Submit */}
                         <button
                             type="submit"
-                            disabled={isTestMode}
+                            disabled={!canSubmit || isTestMode}
                             style={
-                                isTestMode
+                                !canSubmit || isTestMode
                                     ? formStyles.submitBtnDisabled
                                     : formStyles.primaryBtn
                             }
                         >
                             Submit
                         </button>
+                    </div>
+
+                    {isTestMode && (
+                        <div style={{ ...formStyles.inlineText, color: "#f59e0b" }}>
+                            Test mode: submission is disabled.
+                        </div>
                     )}
 
+
+                    {!isTestMode && !hasNextStep && areConditionalsResolved && (
+                        <div style={{ ...formStyles.inlineText, color: "#10b981" }}>
+                            No additional fields. You can submit now.
+                        </div>
+                    )}
                 </div>
             </form>
         </div>

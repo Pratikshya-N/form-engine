@@ -72,6 +72,18 @@ export const formStyles: Record<string, CSSProperties> = {
     padding: "12px 16px",
     borderTop: "1px solid #eee",
     background: "#fff",
+    flexDirection: "column",   // IMPORTANT for inline message
+  },
+  btnDiv: {
+    display: "flex",
+    gap: 10,
+    justifyContent: "flex-end"
+  },
+  inlineText: {
+    marginTop: 5,
+    fontSize: 15,
+    display: "flex",
+    justifyContent: "flex-end"
   },
   label: {
     display: "block",
